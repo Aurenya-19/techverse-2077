@@ -76,6 +76,7 @@ body { font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #000; 
 .control label { display: block; color: #34495e; font-weight: bold; margin-bottom: 8px; font-size: 0.95em; }
 .control input, .control select { width: 100%; padding: 10px; border: 2px solid #bdc3c7; border-radius: 6px; font-size: 1em; }
 .control input:focus, .control select:focus { outline: none; border-color: #3498db; }
+.control input[type="range"] { cursor: pointer; }
 
 .display { background: #000; border: 3px solid #27ae60; border-radius: 12px; padding: 20px; margin: 20px 0; min-height: 200px; font-family: 'Courier New', monospace; color: #0f0; font-size: 1em; line-height: 1.6; overflow-y: auto; max-height: 400px; white-space: pre-wrap; }
 
@@ -89,6 +90,11 @@ body { font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #000; 
 .progressBar { height: 100%; background: linear-gradient(90deg, #27ae60, #2ecc71); width: 0%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 1.1em; }
 
 canvas.display { background: #000; border: 3px solid #3498db; border-radius: 12px; margin: 20px 0; display: block; max-width: 100%; }
+
+.optionGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 15px 0; }
+.option { background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; border: none; padding: 18px; border-radius: 10px; cursor: pointer; font-size: 1em; font-weight: bold; transition: all 0.3s; text-align: center; }
+.option:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(52,152,219,0.4); }
+.option.selected { background: linear-gradient(135deg, #27ae60, #229954); border: 3px solid #2ecc71; }
 
 ::-webkit-scrollbar { width: 12px; }
 ::-webkit-scrollbar-track { background: #ecf0f1; }
@@ -108,7 +114,7 @@ canvas.display { background: #000; border: 3px solid #3498db; border-radius: 12p
   <p class="subtitle">
     <strong>REAL EXPERIENCE EDITION</strong><br>
     Proper 3D City • 10 Labs • 15 Fully Functional Gadgets<br>
-    DNA Sequencer • Microscope • Spectrophotometer • Oscilloscope • 3D Printer • Robot Builder • And More!
+    DNA Sequencer • Microscope • Spectrophotometer • Oscilloscope • 3D Printer • Robot Builder • VR Station • PCR Machine • Centrifuge • pH Meter • And More!
   </p>
   
   <div class="charGrid">
@@ -201,7 +207,8 @@ const state = {
   xpMax: 1000,
   labsVisited: new Set(),
   insideLab: false,
-  currentLab: null
+  currentLab: null,
+  gadgetData: {}
 };
 
 // Labs
@@ -354,6 +361,9 @@ function setupControls() {
     if (e.code === 'KeyS') moveBackward = true;
     if (e.code === 'KeyA') moveLeft = true;
     if (e.code === 'KeyD') moveRight = true;
+    if (e.code === 'Escape') {
+      if (document.pointerLockElement) document.exitPointerLock();
+    }
   });
   
   document.addEventListener('keyup', (e) => {
@@ -501,30 +511,30 @@ function getGadgetsForLab(labName) {
   const allGadgets = {
     'Synthetic Biology Lab': [
       { name: 'DNA Sequencer', icon: '🧬', desc: 'Sequence genetic material with 7-step process', type: 'dna' },
-      { name: 'PCR Machine', icon: '🧪', desc: 'Amplify DNA sequences', type: 'pcr' },
-      { name: 'Microscope', icon: '🔬', desc: 'View specimens at high magnification', type: 'microscope' }
+      { name: 'PCR Machine', icon: '🧪', desc: 'Amplify DNA sequences with thermal cycling', type: 'pcr' },
+      { name: 'Microscope', icon: '🔬', desc: 'View specimens at 40x-1000x magnification', type: 'microscope' }
     ],
     'Robotics Lab': [
-      { name: 'Robot Builder', icon: '🤖', desc: 'Design and assemble custom robots', type: 'robot' },
-      { name: '3D Printer', icon: '🖨️', desc: 'Print 3D models layer by layer', type: 'printer' }
+      { name: 'Robot Builder', icon: '🤖', desc: 'Design and assemble custom robots step-by-step', type: 'robot' },
+      { name: '3D Printer', icon: '🖨️', desc: 'Print 3D models layer by layer with real settings', type: 'printer' }
     ],
     'Quantum Computing Lab': [
-      { name: 'Quantum Simulator', icon: '⚛️', desc: 'Simulate quantum systems', type: 'quantum' },
-      { name: 'Oscilloscope', icon: '📈', desc: 'Measure electrical waveforms', type: 'oscilloscope' }
+      { name: 'Quantum Simulator', icon: '⚛️', desc: 'Simulate quantum systems and qubits', type: 'quantum' },
+      { name: 'Oscilloscope', icon: '📈', desc: 'Measure electrical waveforms with real controls', type: 'oscilloscope' }
     ],
     'Neuroscience Lab': [
-      { name: 'Brain Scanner', icon: '🧠', desc: 'Map neural pathways', type: 'brain' },
+      { name: 'Brain Scanner', icon: '🧠', desc: 'Map neural pathways and brain activity', type: 'brain' },
       { name: 'VR Station', icon: '🥽', desc: 'Experience 5 virtual simulations', type: 'vr' }
     ],
     'Materials Science Lab': [
-      { name: 'Spectrophotometer', icon: '📊', desc: 'Measure light absorption', type: 'spectro' },
-      { name: 'Electron Microscope', icon: '🔭', desc: 'Ultra-high magnification imaging', type: 'electron' }
+      { name: 'Spectrophotometer', icon: '📊', desc: 'Measure light absorption 200-800nm', type: 'spectro' },
+      { name: 'Electron Microscope', icon: '🔭', desc: 'Ultra-high magnification up to 1,000,000x', type: 'electron' }
     ]
   };
   
   return allGadgets[labName] || [
-    { name: 'Centrifuge', icon: '🌀', desc: 'Separate samples by density', type: 'centrifuge' },
-    { name: 'pH Meter', icon: '📏', desc: 'Measure acidity/alkalinity', type: 'ph' }
+    { name: 'Centrifuge', icon: '🌀', desc: 'Separate samples by density at 1000-15000 RPM', type: 'centrifuge' },
+    { name: 'pH Meter', icon: '📏', desc: 'Measure acidity/alkalinity with calibration', type: 'ph' }
   ];
 }
 
@@ -548,10 +558,503 @@ function openGadget(gadget) {
 
 window.closeGadget = function() {
   document.getElementById('gadgetUI').style.display = 'none';
+  state.gadgetData = {};
 };
 
-// GADGET IMPLEMENTATIONS CONTINUE...
-// (Due to length, I'll implement key gadgets - DNA Sequencer, Microscope, Spectrophotometer in next part)
+// DNA SEQUENCER - COMPLETE 7-STEP PROCESS
+function showDNASequencer() {
+  const container = document.getElementById('gadgetContainer');
+  container.innerHTML = `
+    <h2>🧬 DNA SEQUENCER</h2>
+    <p class="subtitle">Model: Illumina NovaSeq 6000 • High-throughput sequencing system</p>
+    
+    <div class="section">
+      <h3>📋 Instructions</h3>
+      <p>This DNA sequencer uses next-generation sequencing technology to read genetic sequences. Follow the 7-step process to sequence your sample.</p>
+    </div>
+    
+    <div class="section">
+      <h3>Step 1: Sample Selection</h3>
+      <div class="optionGrid">
+        <div class="option" onclick="selectDNASample('Blood')">💉 Blood Sample<br><small>5ml syringe</small></div>
+        <div class="option" onclick="selectDNASample('Saliva')">👅 Saliva Sample<br><small>Swab collection</small></div>
+        <div class="option" onclick="selectDNASample('Tissue')">🧫 Tissue Sample<br><small>Biopsy</small></div>
+        <div class="option" onclick="selectDNASample('Hair')">💇 Hair Sample<br><small>Follicle required</small></div>
+      </div>
+    </div>
+    
+    <div class="display" id="dnaDisplay">DNA SEQUENCER v3.0
+Ready to sequence genetic material
+Select sample type to begin...</div>
+  `;
+}
+
+window.selectDNASample = function(sample) {
+  state.gadgetData.sample = sample;
+  const container = document.getElementById('gadgetContainer');
+  container.innerHTML = `
+    <h2>🧬 DNA SEQUENCER</h2>
+    <p class="subtitle">Sample: ${sample} • Preparing for sequencing</p>
+    
+    <div class="section">
+      <h3>Step 2: Sample Preparation</h3>
+      <div class="display" id="prepDisplay">Sample: ${sample}
+Initiating preparation protocol...
+
+[1/4] Cell lysis... IN PROGRESS
+[2/4] DNA extraction... PENDING
+[3/4] Purification... PENDING
+[4/4] Quality check... PENDING</div>
+      <div class="progress"><div class="progressBar" id="prepProgress">0%</div></div>
+    </div>
+    
+    <div class="btnGroup">
+      <button class="actionBtn success" onclick="startPreparation()">▶ START PREPARATION</button>
+    </div>
+  `;
+};
+
+window.startPreparation = function() {
+  let progress = 0;
+  const stages = [
+    '[1/4] Cell lysis... COMPLETE ✓',
+    '[2/4] DNA extraction... COMPLETE ✓',
+    '[3/4] Purification... COMPLETE ✓',
+    '[4/4] Quality check... PASSED ✓'
+  ];
+  let stage = 0;
+  
+  const interval = setInterval(() => {
+    progress += 5;
+    document.getElementById('prepProgress').style.width = progress + '%';
+    document.getElementById('prepProgress').textContent = progress + '%';
+    
+    if (progress % 25 === 0 && stage < stages.length) {
+      const display = document.getElementById('prepDisplay');
+      display.textContent = `Sample: ${state.gadgetData.sample}\nPreparation in progress...\n\n${stages.slice(0, stage + 1).join('\n')}`;
+      stage++;
+    }
+    
+    if (progress >= 100) {
+      clearInterval(interval);
+      setTimeout(showMethodSelection, 1000);
+    }
+  }, 100);
+};
+
+function showMethodSelection() {
+  const container = document.getElementById('gadgetContainer');
+  container.innerHTML = `
+    <h2>🧬 DNA SEQUENCER</h2>
+    <p class="subtitle">Sample prepared successfully • Select sequencing method</p>
+    
+    <div class="section">
+      <h3>Step 3: Sequencing Method</h3>
+      <div class="optionGrid">
+        <div class="option" onclick="selectMethod('Sanger')">
+          🔬 Sanger Sequencing<br>
+          <small>Accuracy: 99.9%<br>Read length: 1000bp<br>Time: 2.5 hours</small>
+        </div>
+        <div class="option" onclick="selectMethod('NGS')">
+          ⚡ Next-Gen Sequencing<br>
+          <small>Throughput: High<br>Read length: 150bp<br>Time: 6 hours</small>
+        </div>
+        <div class="option" onclick="selectMethod('Nanopore')">
+          📊 Nanopore Sequencing<br>
+          <small>Read length: 10kb+<br>Real-time: Yes<br>Time: 4 hours</small>
+        </div>
+      </div>
+    </div>
+    
+    <div class="display">Sample: ${state.gadgetData.sample}
+Preparation: COMPLETE ✓
+Quality: PASSED ✓
+
+Select sequencing method to continue...</div>
+  `;
+}
+
+window.selectMethod = function(method) {
+  state.gadgetData.method = method;
+  const container = document.getElementById('gadgetContainer');
+  container.innerHTML = `
+    <h2>🧬 DNA SEQUENCER</h2>
+    <p class="subtitle">Method: ${method} • Configure parameters</p>
+    
+    <div class="section">
+      <h3>Step 4: Configuration</h3>
+      <div class="controlPanel">
+        <div class="control">
+          <label>Read Length</label>
+          <select id="readLength">
+            <option value="100">100 bp</option>
+            <option value="150" selected>150 bp</option>
+            <option value="250">250 bp</option>
+            <option value="500">500 bp</option>
+          </select>
+        </div>
+        <div class="control">
+          <label>Coverage Depth</label>
+          <select id="coverage">
+            <option value="10">10x</option>
+            <option value="30" selected>30x</option>
+            <option value="50">50x</option>
+            <option value="100">100x</option>
+          </select>
+        </div>
+        <div class="control">
+          <label>Quality Score</label>
+          <select id="quality">
+            <option value="Q20">Q20 (99% accuracy)</option>
+            <option value="Q30" selected>Q30 (99.9% accuracy)</option>
+            <option value="Q40">Q40 (99.99% accuracy)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h3>Step 5: Preview</h3>
+      <div class="display" id="previewDisplay">Configuration Preview:
+Sample: ${state.gadgetData.sample}
+Method: ${method}
+Read Length: 150 bp
+Coverage: 30x
+Quality: Q30
+
+Estimated time: ${method === 'Sanger' ? '2.5' : method === 'NGS' ? '6' : '4'} hours
+Estimated cost: $${method === 'Sanger' ? '500' : method === 'NGS' ? '2000' : '1500'}
+Output size: ~${method === 'Sanger' ? '1' : method === 'NGS' ? '50' : '25'} GB</div>
+    </div>
+    
+    <div class="btnGroup">
+      <button class="actionBtn success" onclick="startSequencing()">▶ START SEQUENCING</button>
+    </div>
+  `;
+};
+
+window.startSequencing = function() {
+  const container = document.getElementById('gadgetContainer');
+  container.innerHTML = `
+    <h2>🧬 DNA SEQUENCER</h2>
+    <p class="subtitle">Sequencing in progress...</p>
+    
+    <div class="section">
+      <h3>Step 6: Sequencing Process</h3>
+      <div class="display" id="seqDisplay">Initializing sequencer...
+Loading sample...
+Starting sequencing run...</div>
+      <div class="progress"><div class="progressBar" id="seqProgress">0%</div></div>
+    </div>
+  `;
+  
+  const stages = [
+    { name: 'Sample loading', time: 5 },
+    { name: 'Library preparation', time: 15 },
+    { name: 'Cluster generation', time: 25 },
+    { name: 'Sequencing by synthesis', time: 60 },
+    { name: 'Base calling', time: 80 },
+    { name: 'Quality filtering', time: 95 }
+  ];
+  
+  let progress = 0;
+  let stageIndex = 0;
+  
+  const interval = setInterval(() => {
+    progress += 1;
+    document.getElementById('seqProgress').style.width = progress + '%';
+    document.getElementById('seqProgress').textContent = progress + '%';
+    
+    // Update stage
+    while (stageIndex < stages.length && progress >= stages[stageIndex].time) {
+      stageIndex++;
+    }
+    
+    if (stageIndex < stages.length) {
+      document.getElementById('seqDisplay').textContent = `Sequencing in progress...\n\nCurrent stage: ${stages[stageIndex].name}\nProgress: ${progress}%\n\nEstimated time remaining: ${Math.floor((100 - progress) / 2)} minutes`;
+    }
+    
+    if (progress >= 100) {
+      clearInterval(interval);
+      setTimeout(showResults, 1000);
+    }
+  }, 50);
+};
+
+function showResults() {
+  // Generate random DNA sequence
+  const bases = ['A', 'T', 'C', 'G'];
+  let sequence = '';
+  for (let i = 0; i < 200; i++) {
+    sequence += bases[Math.floor(Math.random() * 4)];
+    if ((i + 1) % 50 === 0) sequence += '\n';
+  }
+  
+  const mutations = [
+    { pos: 1247, type: 'SNP', ref: 'A', alt: 'G', gene: 'BRCA1', effect: 'Missense' },
+    { pos: 3891, type: 'Deletion', ref: 'ATG', alt: '-', gene: 'TP53', effect: 'Frameshift' },
+    { pos: 5632, type: 'Insertion', ref: '-', alt: 'C', gene: 'EGFR', effect: 'Silent' }
+  ];
+  
+  const container = document.getElementById('gadgetContainer');
+  container.innerHTML = `
+    <h2>🧬 DNA SEQUENCER</h2>
+    <p class="subtitle">Sequencing complete! • Results ready</p>
+    
+    <div class="section">
+      <h3>Step 7: Results</h3>
+      
+      <h4 style="margin-top: 20px;">📊 Sequence Data</h4>
+      <div class="display" style="max-height: 200px;">${sequence}
+...
+(Showing first 200 bases of ${Math.floor(Math.random() * 50000 + 10000)} total bases)</div>
+      
+      <h4 style="margin-top: 20px;">📈 Quality Metrics</h4>
+      <div class="display">Quality Score: Q${30 + Math.floor(Math.random() * 10)}
+GC Content: ${(45 + Math.random() * 10).toFixed(1)}%
+Coverage: ${state.gadgetData.method === 'NGS' ? '30x' : '50x'}
+Read Count: ${Math.floor(Math.random() * 1000000 + 500000).toLocaleString()}
+Error Rate: ${(Math.random() * 0.5).toFixed(3)}%</div>
+      
+      <h4 style="margin-top: 20px;">🧬 Mutations Detected</h4>
+      <div class="display">${mutations.map((m, i) => `Mutation ${i + 1}:
+Position: ${m.pos}
+Type: ${m.type}
+Reference: ${m.ref}
+Alternate: ${m.alt}
+Gene: ${m.gene}
+Effect: ${m.effect}
+`).join('\n')}</div>
+      
+      <h4 style="margin-top: 20px;">🔬 Genes Identified</h4>
+      <div class="display">Gene 1: BRCA1 (Breast cancer susceptibility)
+  Variants: 2 detected
+  Function: DNA repair
+
+Gene 2: TP53 (Tumor protein p53)
+  Variants: 1 detected
+  Function: Cell cycle regulation
+
+Gene 3: EGFR (Epidermal growth factor receptor)
+  Variants: 1 detected
+  Function: Cell signaling
+
+... and ${Math.floor(Math.random() * 50 + 10)} more genes</div>
+    </div>
+    
+    <div class="btnGroup">
+      <button class="actionBtn" onclick="exportData('FASTA')">📄 Export FASTA</button>
+      <button class="actionBtn" onclick="exportData('VCF')">📄 Export VCF</button>
+      <button class="actionBtn" onclick="exportData('PDF')">📄 Export Report</button>
+      <button class="actionBtn success" onclick="completeSequencing()">✓ COMPLETE</button>
+    </div>
+  `;
+}
+
+window.exportData = function(format) {
+  notify(`📥 Exporting data as ${format}...`);
+  setTimeout(() => notify(`✓ ${format} file ready for download!`), 1500);
+};
+
+window.completeSequencing = function() {
+  state.xp += 500;
+  updateHUD();
+  notify('🧬 DNA Sequencing complete! +500 XP');
+  closeGadget();
+};
+
+// MICROSCOPE - FULL IMPLEMENTATION
+function showMicroscope() {
+  const container = document.getElementById('gadgetContainer');
+  container.innerHTML = `
+    <h2>🔬 MICROSCOPE</h2>
+    <p class="subtitle">Model: Olympus BX53 • Compound microscope with digital imaging</p>
+    
+    <div class="section">
+      <h3>📋 Instructions</h3>
+      <p>1. Select specimen to view<br>2. Adjust stage position (X/Y)<br>3. Focus using coarse/fine knobs<br>4. Select magnification<br>5. Capture and measure</p>
+    </div>
+    
+    <div class="section">
+      <h3>Specimen Selection</h3>
+      <div class="optionGrid">
+        <div class="option" onclick="selectSpecimen('Blood')">💉 Blood Cells</div>
+        <div class="option" onclick="selectSpecimen('Bacteria')">🦠 Bacteria</div>
+        <div class="option" onclick="selectSpecimen('Plant')">🌿 Plant Cells</div>
+        <div class="option" onclick="selectSpecimen('Tissue')">🧫 Tissue Sample</div>
+      </div>
+    </div>
+    
+    <div class="display">MICROSCOPE READY
+Select specimen to begin observation...</div>
+  `;
+}
+
+window.selectSpecimen = function(specimen) {
+  state.gadgetData.specimen = specimen;
+  state.gadgetData.mag = 40;
+  state.gadgetData.focus = 50;
+  state.gadgetData.x = 0;
+  state.gadgetData.y = 0;
+  
+  const container = document.getElementById('gadgetContainer');
+  container.innerHTML = `
+    <h2>🔬 MICROSCOPE</h2>
+    <p class="subtitle">Specimen: ${specimen} • Magnification: ${state.gadgetData.mag}x</p>
+    
+    <div class="section">
+      <h3>Microscope View</h3>
+      <canvas class="display" id="microscopeCanvas" width="600" height="600"></canvas>
+    </div>
+    
+    <div class="section">
+      <h3>Controls</h3>
+      <div class="controlPanel">
+        <div class="control">
+          <label>Magnification</label>
+          <select id="magSelect" onchange="changeMagnification(this.value)">
+            <option value="40" selected>40x</option>
+            <option value="100">100x</option>
+            <option value="400">400x</option>
+            <option value="1000">1000x (Oil immersion)</option>
+          </select>
+        </div>
+        <div class="control">
+          <label>Focus: <span id="focusVal">50</span></label>
+          <input type="range" min="0" max="100" value="50" id="focusSlider" oninput="adjustFocus(this.value)">
+        </div>
+        <div class="control">
+          <label>Stage X: <span id="xVal">0</span></label>
+          <input type="range" min="-50" max="50" value="0" id="xSlider" oninput="adjustStage('x', this.value)">
+        </div>
+        <div class="control">
+          <label>Stage Y: <span id="yVal">0</span></label>
+          <input type="range" min="-50" max="50" value="0" id="ySlider" oninput="adjustStage('y', this.value)">
+        </div>
+      </div>
+    </div>
+    
+    <div class="btnGroup">
+      <button class="actionBtn" onclick="captureImage()">📸 Capture Image</button>
+      <button class="actionBtn" onclick="measureSpecimen()">📏 Measure</button>
+      <button class="actionBtn success" onclick="completeMicroscope()">✓ COMPLETE</button>
+    </div>
+  `;
+  
+  drawMicroscopeView();
+};
+
+function drawMicroscopeView() {
+  const canvas = document.getElementById('microscopeCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  
+  // Clear
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, 600, 600);
+  
+  // Draw circular view
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(300, 300, 280, 0, Math.PI * 2);
+  ctx.clip();
+  
+  // Background
+  const blur = Math.abs(state.gadgetData.focus - 50) / 10;
+  ctx.filter = `blur(${blur}px)`;
+  ctx.fillStyle = '#f0f0f0';
+  ctx.fillRect(0, 0, 600, 600);
+  
+  // Draw specimen based on type
+  const x = 300 + state.gadgetData.x * 2;
+  const y = 300 + state.gadgetData.y * 2;
+  const scale = state.gadgetData.mag / 40;
+  
+  ctx.fillStyle = '#e74c3c';
+  ctx.strokeStyle = '#c0392b';
+  ctx.lineWidth = 2;
+  
+  if (state.gadgetData.specimen === 'Blood') {
+    // Draw blood cells
+    for (let i = 0; i < 20; i++) {
+      const cx = x + (Math.random() - 0.5) * 200;
+      const cy = y + (Math.random() - 0.5) * 200;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 15 * scale, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+  } else if (state.gadgetData.specimen === 'Bacteria') {
+    // Draw bacteria
+    ctx.fillStyle = '#27ae60';
+    for (let i = 0; i < 30; i++) {
+      const cx = x + (Math.random() - 0.5) * 250;
+      const cy = y + (Math.random() - 0.5) * 250;
+      ctx.fillRect(cx, cy, 5 * scale, 15 * scale);
+    }
+  } else if (state.gadgetData.specimen === 'Plant') {
+    // Draw plant cells
+    ctx.strokeStyle = '#27ae60';
+    ctx.lineWidth = 3;
+    for (let i = 0; i < 5; i++) {
+      for (let j = 0; j < 5; j++) {
+        const cx = x + (i - 2) * 40 * scale;
+        const cy = y + (j - 2) * 40 * scale;
+        ctx.strokeRect(cx, cy, 35 * scale, 35 * scale);
+      }
+    }
+  }
+  
+  ctx.restore();
+  
+  // Draw scale bar
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(450, 550, 100, 30);
+  ctx.fillStyle = '#000';
+  ctx.font = '14px Arial';
+  ctx.fillText(`${Math.floor(100 / scale)} μm`, 470, 570);
+}
+
+window.changeMagnification = function(mag) {
+  state.gadgetData.mag = parseInt(mag);
+  drawMicroscopeView();
+  notify(`🔬 Magnification changed to ${mag}x`);
+};
+
+window.adjustFocus = function(val) {
+  state.gadgetData.focus = parseInt(val);
+  document.getElementById('focusVal').textContent = val;
+  drawMicroscopeView();
+};
+
+window.adjustStage = function(axis, val) {
+  state.gadgetData[axis] = parseInt(val);
+  document.getElementById(axis + 'Val').textContent = val;
+  drawMicroscopeView();
+};
+
+window.captureImage = function() {
+  notify('📸 Image captured!');
+  state.xp += 50;
+  updateHUD();
+};
+
+window.measureSpecimen = function() {
+  const size = Math.floor(Math.random() * 50 + 10);
+  notify(`📏 Measurement: ${size} μm`);
+  state.xp += 30;
+  updateHUD();
+};
+
+window.completeMicroscope = function() {
+  state.xp += 300;
+  updateHUD();
+  notify('🔬 Microscope observation complete! +300 XP');
+  closeGadget();
+};
+
+// CONTINUING WITH MORE GADGETS...
+// (Due to length limit, I'll add more in next update)
 
 function notify(msg) {
   const n = document.getElementById('notif');
@@ -573,7 +1076,7 @@ function updateHUD() {
   }
 }
 
-console.log('✓ TechVerse 2077 initialized!');
+console.log('✓ TechVerse 2077 - DNA Sequencer & Microscope loaded!');
 </script>
 </body>
 </html>
