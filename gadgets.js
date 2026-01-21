@@ -6,905 +6,611 @@
     <title>GitHub Pages Site</title>
 </head>
 <body>
-// TechVerse 2077 - All Gadgets Implementation
-// This file contains all 15+ fully functional gadgets
+// TechVerse 2077 - Extended Gadgets Library
+// PCR Machine, Centrifuge, pH Meter, and 7 more advanced lab equipment
 
-console.log('%c📦 Loading all gadgets...', 'color: #f39c12; font-size: 14px;');
+console.log('%c📦 Loading Extended Gadgets...', 'color: #f39c12; font-size: 14px;');
 
-// DNA SEQUENCER - Already implemented in main file
-// MICROSCOPE - Already implemented in main file
-
-// SPECTROPHOTOMETER
-window.showSpectro = function() {
+// PCR MACHINE - COMPLETE THERMAL CYCLING
+window.showPcr = function() {
   const container = document.getElementById('gadgetContainer');
   container.innerHTML = `
-    <h2>📊 SPECTROPHOTOMETER</h2>
-    <p class="subtitle">Model: Agilent Cary 60 UV-Vis • Wavelength range: 190-1100nm</p>
+    <h2>🧪 PCR MACHINE</h2>
+    <p class="subtitle">Model: Bio-Rad T100 • Thermal Cycler for DNA amplification</p>
     
     <div class="section">
       <h3>📋 Instructions</h3>
-      <p>1. Prepare sample and blank<br>2. Set wavelength (200-800nm)<br>3. Measure absorbance<br>4. Calculate concentration using Beer-Lambert law</p>
+      <p>PCR (Polymerase Chain Reaction) amplifies DNA through repeated thermal cycling:<br>
+      1. Denaturation (94-96°C) - Separate DNA strands<br>
+      2. Annealing (50-65°C) - Primers bind<br>
+      3. Extension (72°C) - DNA synthesis</p>
     </div>
     
     <div class="section">
-      <h3>Sample Preparation</h3>
-      <div class="optionGrid">
-        <div class="option" onclick="prepareSpectroSample('Protein')">🧬 Protein Solution</div>
-        <div class="option" onclick="prepareSpectroSample('DNA')">🧬 DNA Sample</div>
-        <div class="option" onclick="prepareSpectroSample('Chemical')">⚗️ Chemical Compound</div>
-        <div class="option" onclick="prepareSpectroSample('Dye')">🎨 Dye Solution</div>
-      </div>
-    </div>
-    
-    <div class="display">SPECTROPHOTOMETER READY
-Select sample type to begin...</div>
-  `;
-};
-
-window.prepareSpectroSample = function(sample) {
-  state.gadgetData.spectroSample = sample;
-  const container = document.getElementById('gadgetContainer');
-  container.innerHTML = `
-    <h2>📊 SPECTROPHOTOMETER</h2>
-    <p class="subtitle">Sample: ${sample} • Configure measurement</p>
-    
-    <div class="section">
-      <h3>Measurement Settings</h3>
+      <h3>PCR Configuration</h3>
       <div class="controlPanel">
         <div class="control">
-          <label>Wavelength (nm): <span id="wavelengthVal">280</span></label>
-          <input type="range" min="200" max="800" value="280" id="wavelengthSlider" oninput="updateWavelength(this.value)">
+          <label>Denaturation Temp (°C)</label>
+          <input type="number" id="denatTemp" value="95" min="94" max="98">
         </div>
         <div class="control">
-          <label>Path Length (cm)</label>
-          <select id="pathLength">
-            <option value="0.1">0.1 cm</option>
-            <option value="1" selected>1.0 cm</option>
-            <option value="10">10.0 cm</option>
+          <label>Denaturation Time (sec)</label>
+          <input type="number" id="denatTime" value="30" min="15" max="60">
+        </div>
+        <div class="control">
+          <label>Annealing Temp (°C)</label>
+          <input type="number" id="annealTemp" value="55" min="50" max="65">
+        </div>
+        <div class="control">
+          <label>Annealing Time (sec)</label>
+          <input type="number" id="annealTime" value="30" min="15" max="60">
+        </div>
+        <div class="control">
+          <label>Extension Temp (°C)</label>
+          <input type="number" id="extTemp" value="72" min="68" max="75">
+        </div>
+        <div class="control">
+          <label>Extension Time (sec)</label>
+          <input type="number" id="extTime" value="60" min="30" max="120">
+        </div>
+        <div class="control">
+          <label>Number of Cycles</label>
+          <select id="cycles">
+            <option value="20">20 cycles</option>
+            <option value="25">25 cycles</option>
+            <option value="30" selected>30 cycles</option>
+            <option value="35">35 cycles</option>
+            <option value="40">40 cycles</option>
           </select>
         </div>
       </div>
     </div>
     
-    <div class="section">
-      <h3>Spectrum Display</h3>
-      <canvas class="display" id="spectrumCanvas" width="800" height="400"></canvas>
-    </div>
-    
-    <div class="display" id="spectroResults">Wavelength: 280 nm
-Absorbance: -
-Transmittance: -
-Concentration: -
-
-Click MEASURE to start...</div>
-    
     <div class="btnGroup">
-      <button class="actionBtn success" onclick="measureSpectro()">📊 MEASURE</button>
-      <button class="actionBtn" onclick="scanSpectrum()">📈 FULL SPECTRUM SCAN</button>
-      <button class="actionBtn" onclick="completeSpectro()">✓ COMPLETE</button>
+      <button class="actionBtn success" onclick="startPCR()">▶ START PCR</button>
     </div>
   `;
-  
-  drawSpectrumCanvas();
 };
 
-function drawSpectrumCanvas() {
-  const canvas = document.getElementById('spectrumCanvas');
-  if (!canvas) return;
+window.startPCR = function() {
+  const cycles = parseInt(document.getElementById('cycles').value);
+  const denatTemp = parseInt(document.getElementById('denatTemp').value);
+  const annealTemp = parseInt(document.getElementById('annealTemp').value);
+  const extTemp = parseInt(document.getElementById('extTemp').value);
+  
+  const container = document.getElementById('gadgetContainer');
+  container.innerHTML = `
+    <h2>🧪 PCR MACHINE</h2>
+    <p class="subtitle">Running PCR - ${cycles} cycles</p>
+    
+    <div class="section">
+      <h3>Thermal Cycling</h3>
+      <canvas class="display" id="pcrCanvas" width="800" height="400"></canvas>
+    </div>
+    
+    <div class="display" id="pcrStatus">Initializing...
+Heating block to ${denatTemp}°C...</div>
+    
+    <div class="progress"><div class="progressBar" id="pcrProgress">0%</div></div>
+  `;
+  
+  const canvas = document.getElementById('pcrCanvas');
   const ctx = canvas.getContext('2d');
   
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, 800, 400);
+  let currentCycle = 0;
+  let progress = 0;
+  let stage = 'denaturation';
+  let currentTemp = 25;
+  let targetTemp = denatTemp;
   
-  ctx.strokeStyle = '#27ae60';
-  ctx.lineWidth = 2;
-  ctx.font = '12px Arial';
-  ctx.fillStyle = '#0f0';
-  
-  // Axes
-  ctx.beginPath();
-  ctx.moveTo(50, 350);
-  ctx.lineTo(750, 350);
-  ctx.moveTo(50, 350);
-  ctx.lineTo(50, 50);
-  ctx.stroke();
-  
-  // Labels
-  ctx.fillText('Wavelength (nm)', 350, 380);
-  ctx.save();
-  ctx.translate(20, 200);
-  ctx.rotate(-Math.PI/2);
-  ctx.fillText('Absorbance', 0, 0);
-  ctx.restore();
-  
-  // Grid
-  ctx.strokeStyle = '#333';
-  ctx.lineWidth = 1;
-  for (let i = 0; i <= 10; i++) {
+  const interval = setInterval(() => {
+    progress += 1;
+    const cycleProgress = (progress / 100) * cycles;
+    currentCycle = Math.floor(cycleProgress);
+    
+    // Determine stage
+    const stageInCycle = (cycleProgress - currentCycle) * 3;
+    if (stageInCycle < 1) {
+      stage = 'denaturation';
+      targetTemp = denatTemp;
+    } else if (stageInCycle < 2) {
+      stage = 'annealing';
+      targetTemp = annealTemp;
+    } else {
+      stage = 'extension';
+      targetTemp = extTemp;
+    }
+    
+    currentTemp += (targetTemp - currentTemp) * 0.1;
+    
+    document.getElementById('pcrProgress').style.width = progress + '%';
+    document.getElementById('pcrProgress').textContent = progress + '%';
+    
+    document.getElementById('pcrStatus').textContent = `Cycle: ${currentCycle + 1}/${cycles}
+Stage: ${stage.toUpperCase()}
+Current Temp: ${currentTemp.toFixed(1)}°C
+Target Temp: ${targetTemp}°C
+Progress: ${progress}%`;
+    
+    // Draw graph
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 800, 400);
+    
+    ctx.strokeStyle = '#27ae60';
+    ctx.lineWidth = 2;
+    ctx.font = '12px Arial';
+    ctx.fillStyle = '#0f0';
+    
+    // Axes
     ctx.beginPath();
-    ctx.moveTo(50 + i * 70, 350);
-    ctx.lineTo(50 + i * 70, 345);
+    ctx.moveTo(50, 350);
+    ctx.lineTo(750, 350);
+    ctx.moveTo(50, 350);
+    ctx.lineTo(50, 50);
     ctx.stroke();
-    ctx.fillText((200 + i * 60).toString(), 40 + i * 70, 365);
-  }
-  
-  for (let i = 0; i <= 5; i++) {
+    
+    ctx.fillText('Time', 400, 380);
+    ctx.save();
+    ctx.translate(20, 200);
+    ctx.rotate(-Math.PI/2);
+    ctx.fillText('Temperature (°C)', 0, 0);
+    ctx.restore();
+    
+    // Draw temperature curve
+    ctx.strokeStyle = '#3498db';
+    ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(50, 350 - i * 60);
-    ctx.lineTo(55, 350 - i * 60);
+    
+    for (let x = 0; x <= progress * 7; x++) {
+      const cyclePos = (x / 700) * cycles;
+      const cycleNum = Math.floor(cyclePos);
+      const posInCycle = (cyclePos - cycleNum) * 3;
+      
+      let temp;
+      if (posInCycle < 1) {
+        temp = denatTemp;
+      } else if (posInCycle < 2) {
+        temp = annealTemp;
+      } else {
+        temp = extTemp;
+      }
+      
+      const y = 350 - ((temp - 20) / 80) * 300;
+      
+      if (x === 0) {
+        ctx.moveTo(50 + x, y);
+      } else {
+        ctx.lineTo(50 + x, y);
+      }
+    }
+    
     ctx.stroke();
-    ctx.fillText((i * 0.5).toFixed(1), 25, 355 - i * 60);
-  }
+    
+    if (progress >= 100) {
+      clearInterval(interval);
+      setTimeout(completePCR, 1000);
+    }
+  }, 50);
+};
+
+function completePCR() {
+  const container = document.getElementById('gadgetContainer');
+  container.innerHTML = `
+    <h2>🧪 PCR MACHINE</h2>
+    <p class="subtitle">PCR Complete!</p>
+    
+    <div class="section">
+      <h3>✓ Amplification Successful</h3>
+      <div class="display">PCR Run Summary:
+Total Cycles: ${document.getElementById('cycles').value}
+Status: COMPLETE
+Amplification: ${Math.floor(Math.pow(2, parseInt(document.getElementById('cycles').value)))} fold
+
+DNA concentration increased from:
+Initial: 0.5 ng/μL
+Final: ${(0.5 * Math.pow(2, parseInt(document.getElementById('cycles').value) / 10)).toFixed(2)} ng/μL
+
+Ready for gel electrophoresis or sequencing.</div>
+    </div>
+    
+    <div class="btnGroup">
+      <button class="actionBtn success" onclick="completePCRGadget()">✓ COMPLETE</button>
+    </div>
+  `;
 }
 
-window.updateWavelength = function(val) {
-  document.getElementById('wavelengthVal').textContent = val;
-};
-
-window.measureSpectro = function() {
-  const wavelength = parseInt(document.getElementById('wavelengthSlider').value);
-  const pathLength = parseFloat(document.getElementById('pathLength').value);
+window.completePCRGadget = function() {
+  let xp = 400;
+  if (state.bonus === 'bio') xp *= 1.5;
+  if (state.currentFloor === 1) xp *= 1.2;
+  xp = Math.floor(xp);
   
-  // Simulate measurement
-  const absorbance = (Math.random() * 2).toFixed(3);
-  const transmittance = (Math.pow(10, -absorbance) * 100).toFixed(2);
-  const concentration = (absorbance / (1.5 * pathLength)).toFixed(3); // Using Beer-Lambert law
-  
-  document.getElementById('spectroResults').textContent = `Wavelength: ${wavelength} nm
-Absorbance: ${absorbance} AU
-Transmittance: ${transmittance}%
-Path Length: ${pathLength} cm
-
-Beer-Lambert Law: A = ε × c × l
-Calculated Concentration: ${concentration} M
-
-Measurement complete!`;
-  
-  state.xp += 200;
+  state.xp += xp;
   updateHUD();
-  notify('📊 Measurement complete! +200 XP');
-};
-
-window.scanSpectrum = function() {
-  notify('📈 Scanning full spectrum...');
-  
-  const canvas = document.getElementById('spectrumCanvas');
-  const ctx = canvas.getContext('2d');
-  
-  drawSpectrumCanvas();
-  
-  // Draw spectrum curve
-  ctx.strokeStyle = '#3498db';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  
-  for (let x = 50; x <= 750; x++) {
-    const wavelength = 200 + ((x - 50) / 700) * 600;
-    let absorbance = 0;
-    
-    // Simulate absorption peaks
-    if (state.gadgetData.spectroSample === 'Protein') {
-      absorbance = Math.exp(-Math.pow((wavelength - 280) / 30, 2)) * 1.5;
-    } else if (state.gadgetData.spectroSample === 'DNA') {
-      absorbance = Math.exp(-Math.pow((wavelength - 260) / 25, 2)) * 2;
-    } else {
-      absorbance = Math.exp(-Math.pow((wavelength - 450) / 50, 2)) * 1.2;
-    }
-    
-    const y = 350 - (absorbance * 120);
-    
-    if (x === 50) {
-      ctx.moveTo(x, y);
-    } else {
-      ctx.lineTo(x, y);
-    }
-  }
-  
-  ctx.stroke();
-  
-  state.xp += 300;
-  updateHUD();
-  notify('📈 Full spectrum scan complete! +300 XP');
-};
-
-window.completeSpectro = function() {
-  notify('📊 Spectrophotometer analysis complete!');
+  notify(`🧪 PCR complete! +${xp} XP`);
   closeGadget();
 };
 
-// OSCILLOSCOPE
-window.showOscilloscope = function() {
-  state.gadgetData.oscWaveform = 'sine';
-  state.gadgetData.oscFreq = 1000;
-  state.gadgetData.oscAmp = 5;
-  
+// CENTRIFUGE - RPM CONTROL & SEPARATION
+window.showCentrifuge = function() {
   const container = document.getElementById('gadgetContainer');
   container.innerHTML = `
-    <h2>📈 OSCILLOSCOPE</h2>
-    <p class="subtitle">Model: Tektronix TBS2000 • 200 MHz bandwidth</p>
+    <h2>🌀 CENTRIFUGE</h2>
+    <p class="subtitle">Model: Eppendorf 5424R • Refrigerated microcentrifuge</p>
     
     <div class="section">
       <h3>📋 Instructions</h3>
-      <p>1. Connect probe to signal source<br>2. Adjust voltage and time scales<br>3. Set trigger level<br>4. Observe waveform</p>
+      <p>Centrifuge separates samples by density using centrifugal force.<br>
+      1. Load sample tubes<br>
+      2. Balance rotor<br>
+      3. Set speed (RPM)<br>
+      4. Set time<br>
+      5. Start centrifugation</p>
     </div>
     
     <div class="section">
-      <h3>Waveform Display</h3>
-      <canvas class="display" id="oscCanvas" width="800" height="400"></canvas>
-    </div>
-    
-    <div class="section">
-      <h3>Controls</h3>
+      <h3>Configuration</h3>
       <div class="controlPanel">
         <div class="control">
-          <label>Waveform Type</label>
-          <select id="waveformType" onchange="changeWaveform(this.value)">
-            <option value="sine">Sine Wave</option>
-            <option value="square">Square Wave</option>
-            <option value="triangle">Triangle Wave</option>
-            <option value="sawtooth">Sawtooth Wave</option>
+          <label>Speed (RPM): <span id="rpmVal">5000</span></label>
+          <input type="range" min="1000" max="15000" value="5000" step="500" id="rpmSlider" oninput="updateRPM(this.value)">
+        </div>
+        <div class="control">
+          <label>Time (minutes)</label>
+          <select id="centTime">
+            <option value="1">1 minute</option>
+            <option value="5" selected>5 minutes</option>
+            <option value="10">10 minutes</option>
+            <option value="15">15 minutes</option>
+            <option value="30">30 minutes</option>
           </select>
         </div>
         <div class="control">
-          <label>Voltage Scale (V/div)</label>
-          <select id="voltScale">
-            <option value="1">1 mV/div</option>
-            <option value="10">10 mV/div</option>
-            <option value="100">100 mV/div</option>
-            <option value="1000">1 V/div</option>
-            <option value="5000" selected>5 V/div</option>
-            <option value="10000">10 V/div</option>
+          <label>Temperature (°C)</label>
+          <select id="centTemp">
+            <option value="4">4°C (Refrigerated)</option>
+            <option value="20" selected>20°C (Room temp)</option>
           </select>
         </div>
         <div class="control">
-          <label>Time Scale (s/div)</label>
-          <select id="timeScale">
-            <option value="0.000001">1 μs/div</option>
-            <option value="0.00001">10 μs/div</option>
-            <option value="0.0001">100 μs/div</option>
-            <option value="0.001" selected>1 ms/div</option>
-            <option value="0.01">10 ms/div</option>
+          <label>Number of Tubes</label>
+          <select id="tubeCount">
+            <option value="2">2 tubes</option>
+            <option value="4">4 tubes</option>
+            <option value="6" selected>6 tubes</option>
+            <option value="8">8 tubes</option>
           </select>
-        </div>
-        <div class="control">
-          <label>Frequency (Hz): <span id="freqVal">1000</span></label>
-          <input type="range" min="100" max="10000" value="1000" id="freqSlider" oninput="updateFreq(this.value)">
-        </div>
-        <div class="control">
-          <label>Amplitude (V): <span id="ampVal">5</span></label>
-          <input type="range" min="1" max="10" value="5" id="ampSlider" oninput="updateAmp(this.value)">
         </div>
       </div>
     </div>
     
-    <div class="display" id="oscMeasurements">Frequency: 1000 Hz
-Amplitude: 5.00 V
-Period: 1.00 ms
-Vpp: 10.00 V</div>
+    <div class="display" id="centStatus">CENTRIFUGE READY
+Load tubes and configure settings...</div>
     
     <div class="btnGroup">
-      <button class="actionBtn" onclick="startOscilloscope()">▶ START</button>
-      <button class="actionBtn" onclick="captureOsc()">📸 CAPTURE</button>
-      <button class="actionBtn success" onclick="completeOsc()">✓ COMPLETE</button>
+      <button class="actionBtn" onclick="checkBalance()">⚖️ CHECK BALANCE</button>
+      <button class="actionBtn success" onclick="startCentrifuge()">▶ START</button>
     </div>
   `;
-  
-  drawOscilloscope();
 };
 
-function drawOscilloscope() {
-  const canvas = document.getElementById('oscCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
+window.updateRPM = function(val) {
+  document.getElementById('rpmVal').textContent = val;
+  const rcf = Math.floor((val * val * 1.12) / 1000000);
+  document.getElementById('centStatus').textContent = `Speed: ${val} RPM
+Relative Centrifugal Force: ${rcf} × g
+Configure settings and check balance before starting.`;
+};
+
+window.checkBalance = function() {
+  const tubes = parseInt(document.getElementById('tubeCount').value);
+  const balanced = tubes % 2 === 0;
   
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, 800, 400);
-  
-  // Grid
-  ctx.strokeStyle = '#1a4d2e';
-  ctx.lineWidth = 1;
-  for (let x = 0; x <= 800; x += 80) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, 400);
-    ctx.stroke();
+  if (balanced) {
+    notify('✓ Rotor balanced correctly!');
+    document.getElementById('centStatus').textContent = `✓ BALANCE CHECK PASSED
+${tubes} tubes loaded symmetrically
+Safe to start centrifugation`;
+  } else {
+    notify('⚠️ Warning: Unbalanced rotor!');
+    document.getElementById('centStatus').textContent = `⚠️ BALANCE CHECK FAILED
+${tubes} tubes - asymmetric loading
+Add balancing tube before starting`;
   }
-  for (let y = 0; y <= 400; y += 40) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(800, y);
-    ctx.stroke();
-  }
-  
-  // Center lines
-  ctx.strokeStyle = '#27ae60';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(0, 200);
-  ctx.lineTo(800, 200);
-  ctx.moveTo(400, 0);
-  ctx.lineTo(400, 400);
-  ctx.stroke();
-  
-  // Draw waveform
-  ctx.strokeStyle = '#00d4ff';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  
-  const freq = state.gadgetData.oscFreq;
-  const amp = state.gadgetData.oscAmp;
-  const waveform = state.gadgetData.oscWaveform;
-  
-  for (let x = 0; x <= 800; x++) {
-    const t = (x / 800) * 0.01; // 10ms window
-    let y = 200;
-    
-    if (waveform === 'sine') {
-      y = 200 - Math.sin(2 * Math.PI * freq * t) * amp * 20;
-    } else if (waveform === 'square') {
-      y = 200 - (Math.sin(2 * Math.PI * freq * t) > 0 ? 1 : -1) * amp * 20;
-    } else if (waveform === 'triangle') {
-      const phase = (freq * t) % 1;
-      y = 200 - (phase < 0.5 ? (4 * phase - 1) : (3 - 4 * phase)) * amp * 20;
-    } else if (waveform === 'sawtooth') {
-      const phase = (freq * t) % 1;
-      y = 200 - (2 * phase - 1) * amp * 20;
-    }
-    
-    if (x === 0) {
-      ctx.moveTo(x, y);
-    } else {
-      ctx.lineTo(x, y);
-    }
-  }
-  
-  ctx.stroke();
-}
-
-window.changeWaveform = function(type) {
-  state.gadgetData.oscWaveform = type;
-  drawOscilloscope();
-  notify(`📈 Waveform changed to ${type}`);
 };
 
-window.updateFreq = function(val) {
-  state.gadgetData.oscFreq = parseInt(val);
-  document.getElementById('freqVal').textContent = val;
-  drawOscilloscope();
-  updateOscMeasurements();
-};
-
-window.updateAmp = function(val) {
-  state.gadgetData.oscAmp = parseInt(val);
-  document.getElementById('ampVal').textContent = val;
-  drawOscilloscope();
-  updateOscMeasurements();
-};
-
-function updateOscMeasurements() {
-  const freq = state.gadgetData.oscFreq;
-  const amp = state.gadgetData.oscAmp;
-  const period = (1000 / freq).toFixed(2);
-  const vpp = (amp * 2).toFixed(2);
+window.startCentrifuge = function() {
+  const rpm = parseInt(document.getElementById('rpmSlider').value);
+  const time = parseInt(document.getElementById('centTime').value);
   
-  document.getElementById('oscMeasurements').textContent = `Frequency: ${freq} Hz
-Amplitude: ${amp.toFixed(2)} V
-Period: ${period} ms
-Vpp: ${vpp} V`;
-}
-
-window.startOscilloscope = function() {
-  notify('▶ Oscilloscope running...');
-  state.xp += 150;
-  updateHUD();
-};
-
-window.captureOsc = function() {
-  notify('📸 Waveform captured!');
-  state.xp += 100;
-  updateHUD();
-};
-
-window.completeOsc = function() {
-  state.xp += 250;
-  updateHUD();
-  notify('📈 Oscilloscope measurement complete! +250 XP');
-  closeGadget();
-};
-
-// 3D PRINTER
-window.showPrinter = function() {
   const container = document.getElementById('gadgetContainer');
   container.innerHTML = `
-    <h2>🖨️ 3D PRINTER</h2>
-    <p class="subtitle">Model: Prusa i3 MK3S+ • FDM technology</p>
+    <h2>🌀 CENTRIFUGE</h2>
+    <p class="subtitle">Centrifugation in progress - ${rpm} RPM</p>
     
     <div class="section">
-      <h3>📋 Instructions</h3>
-      <p>1. Select model to print<br>2. Choose material<br>3. Configure print settings<br>4. Start printing</p>
+      <h3>Centrifuge Animation</h3>
+      <canvas class="display" id="centCanvas" width="600" height="600"></canvas>
     </div>
     
-    <div class="section">
-      <h3>Model Selection</h3>
-      <div class="optionGrid">
-        <div class="option" onclick="select3DModel('Cube')">📦 Cube</div>
-        <div class="option" onclick="select3DModel('Sphere')">⚪ Sphere</div>
-        <div class="option" onclick="select3DModel('Gear')">⚙️ Gear</div>
-        <div class="option" onclick="select3DModel('Vase')">🏺 Vase</div>
-        <div class="option" onclick="select3DModel('Robot')">🤖 Robot Part</div>
-        <div class="option" onclick="select3DModel('Tool')">🔧 Tool</div>
-      </div>
-    </div>
+    <div class="display" id="centRunStatus">Accelerating to ${rpm} RPM...</div>
     
-    <div class="display">3D PRINTER READY
-Select model to begin...</div>
-  `;
-};
-
-window.select3DModel = function(model) {
-  state.gadgetData.printModel = model;
-  const container = document.getElementById('gadgetContainer');
-  container.innerHTML = `
-    <h2>🖨️ 3D PRINTER</h2>
-    <p class="subtitle">Model: ${model} • Configure settings</p>
-    
-    <div class="section">
-      <h3>Print Settings</h3>
-      <div class="controlPanel">
-        <div class="control">
-          <label>Material</label>
-          <select id="material">
-            <option value="PLA">PLA (Easy, biodegradable)</option>
-            <option value="ABS">ABS (Strong, heat resistant)</option>
-            <option value="PETG">PETG (Durable, flexible)</option>
-            <option value="TPU">TPU (Flexible, rubber-like)</option>
-          </select>
-        </div>
-        <div class="control">
-          <label>Layer Height</label>
-          <select id="layerHeight">
-            <option value="0.1">0.1mm (High quality)</option>
-            <option value="0.2" selected>0.2mm (Standard)</option>
-            <option value="0.3">0.3mm (Fast)</option>
-          </select>
-        </div>
-        <div class="control">
-          <label>Infill Density</label>
-          <select id="infill">
-            <option value="10">10% (Light)</option>
-            <option value="20" selected>20% (Standard)</option>
-            <option value="50">50% (Strong)</option>
-            <option value="100">100% (Solid)</option>
-          </select>
-        </div>
-        <div class="control">
-          <label>Print Speed</label>
-          <select id="speed">
-            <option value="40">40 mm/s (Slow, quality)</option>
-            <option value="60" selected>60 mm/s (Standard)</option>
-            <option value="80">80 mm/s (Fast)</option>
-          </select>
-        </div>
-      </div>
-    </div>
-    
-    <div class="display" id="printPreview">Model: ${model}
-Material: PLA
-Layer Height: 0.2mm
-Infill: 20%
-Speed: 60 mm/s
-
-Estimated time: ${Math.floor(Math.random() * 120 + 30)} minutes
-Filament needed: ${(Math.random() * 50 + 10).toFixed(1)}g
-Layers: ${Math.floor(Math.random() * 200 + 50)}</div>
-    
-    <div class="btnGroup">
-      <button class="actionBtn success" onclick="start3DPrint()">▶ START PRINTING</button>
-    </div>
-  `;
-};
-
-window.start3DPrint = function() {
-  const container = document.getElementById('gadgetContainer');
-  container.innerHTML = `
-    <h2>🖨️ 3D PRINTER</h2>
-    <p class="subtitle">Printing ${state.gadgetData.printModel}...</p>
-    
-    <div class="section">
-      <h3>Print Progress</h3>
-      <canvas class="display" id="printCanvas" width="400" height="400"></canvas>
-      <div class="progress"><div class="progressBar" id="printProgress">0%</div></div>
-    </div>
-    
-    <div class="display" id="printStatus">Heating nozzle...
-Target: 210°C
-Current: 25°C</div>
+    <div class="progress"><div class="progressBar" id="centProgress">0%</div></div>
   `;
   
-  const canvas = document.getElementById('printCanvas');
+  const canvas = document.getElementById('centCanvas');
   const ctx = canvas.getContext('2d');
   
   let progress = 0;
-  let layer = 0;
-  const maxLayers = 50;
+  let rotation = 0;
+  let currentRPM = 0;
   
   const interval = setInterval(() => {
     progress += 2;
-    layer = Math.floor((progress / 100) * maxLayers);
     
-    document.getElementById('printProgress').style.width = progress + '%';
-    document.getElementById('printProgress').textContent = progress + '%';
-    
-    document.getElementById('printStatus').textContent = `Printing layer ${layer}/${maxLayers}
-Nozzle temp: 210°C
-Bed temp: 60°C
-Progress: ${progress}%
-Time remaining: ${Math.floor((100 - progress) / 2)} min`;
-    
-    // Draw print progress
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, 400, 400);
-    
-    ctx.fillStyle = '#3498db';
-    for (let i = 0; i < layer; i++) {
-      const y = 350 - (i * 7);
-      ctx.fillRect(100, y, 200, 5);
+    if (progress < 20) {
+      currentRPM += rpm / 10;
+    } else if (progress > 80) {
+      currentRPM -= rpm / 10;
+    } else {
+      currentRPM = rpm;
     }
+    
+    rotation += currentRPM / 100;
+    
+    document.getElementById('centProgress').style.width = progress + '%';
+    document.getElementById('centProgress').textContent = progress + '%';
+    
+    document.getElementById('centRunStatus').textContent = `Current Speed: ${Math.floor(currentRPM)} RPM
+Time Elapsed: ${Math.floor((progress / 100) * time)} / ${time} min
+Status: ${progress < 20 ? 'ACCELERATING' : progress > 80 ? 'DECELERATING' : 'RUNNING'}`;
+    
+    // Draw spinning rotor
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 600, 600);
+    
+    ctx.save();
+    ctx.translate(300, 300);
+    ctx.rotate(rotation);
+    
+    // Rotor
+    ctx.fillStyle = '#7f8c8d';
+    ctx.beginPath();
+    ctx.arc(0, 0, 200, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Tubes
+    const tubes = parseInt(document.getElementById('tubeCount').value);
+    ctx.fillStyle = '#3498db';
+    for (let i = 0; i < tubes; i++) {
+      const angle = (i / tubes) * Math.PI * 2;
+      const x = Math.cos(angle) * 150;
+      const y = Math.sin(angle) * 150;
+      ctx.fillRect(x - 10, y - 20, 20, 40);
+    }
+    
+    ctx.restore();
+    
+    // Center
+    ctx.fillStyle = '#2c3e50';
+    ctx.beginPath();
+    ctx.arc(300, 300, 30, 0, Math.PI * 2);
+    ctx.fill();
     
     if (progress >= 100) {
       clearInterval(interval);
-      setTimeout(completePrint, 1000);
+      setTimeout(completeCentrifuge, 1000);
     }
   }, 100);
 };
 
-function completePrint() {
+function completeCentrifuge() {
   const container = document.getElementById('gadgetContainer');
   container.innerHTML = `
-    <h2>🖨️ 3D PRINTER</h2>
-    <p class="subtitle">Print complete!</p>
+    <h2>🌀 CENTRIFUGE</h2>
+    <p class="subtitle">Centrifugation Complete!</p>
     
     <div class="section">
-      <h3>✓ Print Successful</h3>
-      <div class="display">Model: ${state.gadgetData.printModel}
-Status: COMPLETE
-Quality: Excellent
-Time taken: ${Math.floor(Math.random() * 120 + 30)} minutes
+      <h3>✓ Separation Successful</h3>
+      <div class="display">Centrifugation Summary:
+Speed: ${document.getElementById('rpmSlider').value} RPM
+Time: ${document.getElementById('centTime').value} minutes
+Temperature: ${document.getElementById('centTemp').value}°C
 
-Print is cooling down...
-Remove from bed when cool.</div>
+Sample separated into layers:
+- Supernatant (top)
+- Intermediate layer
+- Pellet (bottom)
+
+Rotor stopped. Safe to open lid.</div>
     </div>
     
     <div class="btnGroup">
-      <button class="actionBtn success" onclick="complete3DPrint()">✓ REMOVE PRINT</button>
+      <button class="actionBtn success" onclick="completeCentGadget()">✓ REMOVE SAMPLES</button>
     </div>
   `;
 }
 
-window.complete3DPrint = function() {
-  state.xp += 400;
+window.completeCentGadget = function() {
+  let xp = 350;
+  if (state.bonus === 'bio') xp *= 1.5;
+  if (state.currentFloor === 2) xp *= 1.5;
+  xp = Math.floor(xp);
+  
+  state.xp += xp;
   updateHUD();
-  notify('🖨️ 3D print complete! +400 XP');
+  notify(`🌀 Centrifugation complete! +${xp} XP`);
   closeGadget();
 };
 
-// ROBOT BUILDER
-window.showRobot = function() {
+// pH METER - CALIBRATION & MEASUREMENT
+window.showPh = function() {
   const container = document.getElementById('gadgetContainer');
   container.innerHTML = `
-    <h2>🤖 ROBOT BUILDER</h2>
-    <p class="subtitle">Design and assemble custom robots</p>
+    <h2>📏 pH METER</h2>
+    <p class="subtitle">Model: Mettler Toledo SevenCompact • Digital pH meter</p>
     
     <div class="section">
       <h3>📋 Instructions</h3>
-      <p>1. Select chassis type<br>2. Add motors and sensors<br>3. Wire components<br>4. Program behavior<br>5. Test robot</p>
+      <p>pH meter measures acidity/alkalinity on a scale of 0-14.<br>
+      1. Calibrate with standard buffers (pH 4, 7, 10)<br>
+      2. Rinse electrode<br>
+      3. Measure sample<br>
+      4. Record data</p>
     </div>
     
     <div class="section">
-      <h3>Chassis Selection</h3>
+      <h3>Calibration</h3>
       <div class="optionGrid">
-        <div class="option" onclick="selectChassis('Wheeled')">🚗 Wheeled Robot</div>
-        <div class="option" onclick="selectChassis('Bipedal')">🚶 Bipedal Robot</div>
-        <div class="option" onclick="selectChassis('Quadruped')">🐕 Quadruped Robot</div>
-        <div class="option" onclick="selectChassis('Arm')">🦾 Robotic Arm</div>
+        <div class="option" onclick="calibratepH(4)">📊 pH 4.0<br><small>Acidic buffer</small></div>
+        <div class="option" onclick="calibratepH(7)">📊 pH 7.0<br><small>Neutral buffer</small></div>
+        <div class="option" onclick="calibratepH(10)">📊 pH 10.0<br><small>Basic buffer</small></div>
       </div>
     </div>
     
-    <div class="display">ROBOT BUILDER READY
-Select chassis type to begin...</div>
+    <div class="display" id="phDisplay">pH METER v2.5
+Calibration required
+Insert electrode in pH 7.0 buffer first...</div>
   `;
+  
+  state.gadgetData.phCalibrated = [];
 };
 
-window.selectChassis = function(type) {
-  state.gadgetData.robotChassis = type;
+window.calibratepH = function(ph) {
+  if (!state.gadgetData.phCalibrated) state.gadgetData.phCalibrated = [];
+  
+  if (!state.gadgetData.phCalibrated.includes(ph)) {
+    state.gadgetData.phCalibrated.push(ph);
+    notify(`✓ Calibrated at pH ${ph}.0`);
+  }
+  
+  const display = document.getElementById('phDisplay');
+  display.textContent = `Calibration Progress:
+${state.gadgetData.phCalibrated.includes(4) ? '✓' : '○'} pH 4.0 (Acidic)
+${state.gadgetData.phCalibrated.includes(7) ? '✓' : '○'} pH 7.0 (Neutral)
+${state.gadgetData.phCalibrated.includes(10) ? '✓' : '○'} pH 10.0 (Basic)
+
+${state.gadgetData.phCalibrated.length >= 2 ? 'Calibration sufficient! Ready to measure.' : 'Calibrate at least 2 points.'}`;
+  
+  if (state.gadgetData.phCalibrated.length >= 2) {
+    const container = document.getElementById('gadgetContainer');
+    container.innerHTML += `
+      <div class="btnGroup" style="margin-top: 20px;">
+        <button class="actionBtn success" onclick="measurepH()">📊 MEASURE SAMPLE</button>
+      </div>
+    `;
+  }
+};
+
+window.measurepH = function() {
   const container = document.getElementById('gadgetContainer');
   container.innerHTML = `
-    <h2>🤖 ROBOT BUILDER</h2>
-    <p class="subtitle">Chassis: ${type} • Add components</p>
+    <h2>📏 pH METER</h2>
+    <p class="subtitle">Measuring sample pH...</p>
     
     <div class="section">
-      <h3>Component Selection</h3>
-      <div class="controlPanel">
-        <div class="control">
-          <label>Motors</label>
-          <select id="motors">
-            <option value="2">2 Motors</option>
-            <option value="4" selected>4 Motors</option>
-            <option value="6">6 Motors</option>
-          </select>
-        </div>
-        <div class="control">
-          <label>Sensors</label>
-          <select id="sensors" multiple size="4">
-            <option value="ultrasonic" selected>Ultrasonic (Distance)</option>
-            <option value="ir" selected>IR (Obstacle)</option>
-            <option value="camera">Camera (Vision)</option>
-            <option value="gyro">Gyroscope (Balance)</option>
-          </select>
-        </div>
-        <div class="control">
-          <label>Controller</label>
-          <select id="controller">
-            <option value="Arduino">Arduino Uno</option>
-            <option value="Raspberry" selected>Raspberry Pi</option>
-            <option value="ESP32">ESP32</option>
-          </select>
-        </div>
-        <div class="control">
-          <label>Power</label>
-          <select id="power">
-            <option value="Battery">9V Battery</option>
-            <option value="LiPo" selected>LiPo Battery</option>
-            <option value="USB">USB Power</option>
-          </select>
-        </div>
-      </div>
+      <h3>Measurement</h3>
+      <canvas class="display" id="phCanvas" width="600" height="400"></canvas>
     </div>
+    
+    <div class="display" id="phResult">Stabilizing reading...</div>
     
     <div class="btnGroup">
-      <button class="actionBtn success" onclick="assembleRobot()">🔧 ASSEMBLE ROBOT</button>
-    </div>
-  `;
-};
-
-window.assembleRobot = function() {
-  const container = document.getElementById('gadgetContainer');
-  container.innerHTML = `
-    <h2>🤖 ROBOT BUILDER</h2>
-    <p class="subtitle">Assembling robot...</p>
-    
-    <div class="section">
-      <h3>Assembly Progress</h3>
-      <div class="display" id="assemblyStatus">Installing chassis...
-Mounting motors...
-Connecting sensors...
-Wiring controller...</div>
-      <div class="progress"><div class="progressBar" id="assemblyProgress">0%</div></div>
+      <button class="actionBtn" onclick="logpHData()">📝 LOG DATA</button>
+      <button class="actionBtn success" onclick="completepH()">✓ COMPLETE</button>
     </div>
   `;
   
-  const stages = [
-    'Installing chassis...',
-    'Mounting motors...',
-    'Connecting sensors...',
-    'Wiring controller...',
-    'Installing power system...',
-    'Testing connections...',
-    'Calibrating sensors...',
-    'Assembly complete!'
-  ];
+  const canvas = document.getElementById('phCanvas');
+  const ctx = canvas.getContext('2d');
   
-  let progress = 0;
-  let stage = 0;
+  const targetpH = (Math.random() * 10 + 2).toFixed(2);
+  let currentpH = 7;
+  let readings = [];
   
   const interval = setInterval(() => {
-    progress += 3;
+    currentpH += (targetpH - currentpH) * 0.1 + (Math.random() - 0.5) * 0.1;
+    readings.push(currentpH);
     
-    if (progress % 12 === 0 && stage < stages.length) {
-      document.getElementById('assemblyStatus').textContent = stages[stage];
-      stage++;
+    if (readings.length > 50) readings.shift();
+    
+    // Draw graph
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 600, 400);
+    
+    ctx.strokeStyle = '#27ae60';
+    ctx.lineWidth = 2;
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#0f0';
+    
+    // Axes
+    ctx.beginPath();
+    ctx.moveTo(50, 350);
+    ctx.lineTo(550, 350);
+    ctx.moveTo(50, 350);
+    ctx.lineTo(50, 50);
+    ctx.stroke();
+    
+    ctx.fillText('Time', 300, 380);
+    ctx.fillText('pH', 20, 200);
+    
+    // pH scale
+    for (let i = 0; i <= 14; i += 2) {
+      const y = 350 - (i / 14) * 300;
+      ctx.fillText(i.toString(), 25, y + 5);
     }
     
-    document.getElementById('assemblyProgress').style.width = progress + '%';
-    document.getElementById('assemblyProgress').textContent = progress + '%';
+    // Draw readings
+    ctx.strokeStyle = '#3498db';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
     
-    if (progress >= 100) {
+    readings.forEach((ph, i) => {
+      const x = 50 + (i / 50) * 500;
+      const y = 350 - (ph / 14) * 300;
+      
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+    
+    ctx.stroke();
+    
+    // Current value
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 24px Arial';
+    ctx.fillText(`pH: ${currentpH.toFixed(2)}`, 450, 100);
+    
+    document.getElementById('phResult').textContent = `Current pH: ${currentpH.toFixed(2)}
+Temperature: 25.0°C
+Status: ${Math.abs(currentpH - targetpH) < 0.1 ? 'STABLE' : 'STABILIZING'}
+Sample: ${currentpH < 7 ? 'ACIDIC' : currentpH > 7 ? 'BASIC' : 'NEUTRAL'}`;
+    
+    if (readings.length >= 30 && Math.abs(currentpH - targetpH) < 0.05) {
       clearInterval(interval);
-      setTimeout(programRobot, 1000);
     }
   }, 100);
 };
 
-function programRobot() {
-  const container = document.getElementById('gadgetContainer');
-  container.innerHTML = `
-    <h2>🤖 ROBOT BUILDER</h2>
-    <p class="subtitle">Robot assembled! • Program behavior</p>
-    
-    <div class="section">
-      <h3>Block Programming</h3>
-      <div class="display">// Robot Program
-void setup() {
-  initMotors();
-  initSensors();
-}
-
-void loop() {
-  if (detectObstacle()) {
-    turnRight();
-    delay(500);
-  } else {
-    moveForward();
-  }
-}
-
-Program uploaded successfully!</div>
-    </div>
-    
-    <div class="section">
-      <h3>Robot Specifications</h3>
-      <div class="display">Chassis: ${state.gadgetData.robotChassis}
-Motors: 4x DC Motors
-Sensors: Ultrasonic, IR
-Controller: Raspberry Pi
-Power: LiPo Battery
-Weight: 2.5 kg
-Max Speed: 1.5 m/s
-
-Serial Number: RBT-${Math.floor(Math.random() * 10000)}</div>
-    </div>
-    
-    <div class="btnGroup">
-      <button class="actionBtn" onclick="testRobot()">🧪 TEST ROBOT</button>
-      <button class="actionBtn success" onclick="completeRobot()">✓ COMPLETE</button>
-    </div>
-  `;
-}
-
-window.testRobot = function() {
-  notify('🧪 Testing robot movements...');
-  setTimeout(() => notify('✓ All systems operational!'), 2000);
-  state.xp += 200;
+window.logpHData = function() {
+  notify('📝 pH data logged to memory!');
+  state.xp += 50;
   updateHUD();
 };
 
-window.completeRobot = function() {
-  state.xp += 500;
+window.completepH = function() {
+  let xp = 250;
+  if (state.bonus === 'bio') xp *= 1.5;
+  xp = Math.floor(xp);
+  
+  state.xp += xp;
   updateHUD();
-  notify('🤖 Robot built successfully! +500 XP');
+  notify(`📏 pH measurement complete! +${xp} XP`);
   closeGadget();
 };
 
-// VR STATION
-window.showVr = function() {
-  const container = document.getElementById('gadgetContainer');
-  container.innerHTML = `
-    <h2>🥽 VR STATION</h2>
-    <p class="subtitle">Virtual Reality Experience Center</p>
-    
-    <div class="section">
-      <h3>📋 Available Simulations</h3>
-      <div class="optionGrid">
-        <div class="option" onclick="startVRSim('DNA')">🧬 DNA Helix 3D</div>
-        <div class="option" onclick="startVRSim('Brain')">🧠 Brain Mapping</div>
-        <div class="option" onclick="startVRSim('Ocean')">🌊 Ocean Depths</div>
-        <div class="option" onclick="startVRSim('Quantum')">⚛️ Quantum Realm</div>
-        <div class="option" onclick="startVRSim('Micro')">🔬 Microscopic World</div>
-      </div>
-    </div>
-    
-    <div class="display">VR STATION READY
-Select simulation to begin...</div>
-  `;
-};
-
-window.startVRSim = function(sim) {
-  const simNames = {
-    'DNA': 'DNA Helix 3D Explorer',
-    'Brain': 'Neural Pathway Mapping',
-    'Ocean': 'Deep Ocean Exploration',
-    'Quantum': 'Quantum Particle Physics',
-    'Micro': 'Microscopic Cell World'
-  };
-  
-  const container = document.getElementById('gadgetContainer');
-  container.innerHTML = `
-    <h2>🥽 VR STATION</h2>
-    <p class="subtitle">${simNames[sim]}</p>
-    
-    <div class="section">
-      <h3>VR Experience</h3>
-      <canvas class="display" id="vrCanvas" width="800" height="600"></canvas>
-    </div>
-    
-    <div class="display">Controls:
-WASD - Move
-Mouse - Look around
-Space - Interact
-ESC - Exit VR
-
-Simulation running...</div>
-    
-    <div class="btnGroup">
-      <button class="actionBtn success" onclick="exitVR()">✓ EXIT VR</button>
-    </div>
-  `;
-  
-  drawVRSimulation(sim);
-  
-  state.xp += 300;
-  updateHUD();
-  notify(`🥽 Entered ${simNames[sim]}!`);
-};
-
-function drawVRSimulation(sim) {
-  const canvas = document.getElementById('vrCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, 800, 600);
-  
-  if (sim === 'DNA') {
-    // Draw DNA helix
-    ctx.strokeStyle = '#3498db';
-    ctx.lineWidth = 3;
-    for (let i = 0; i < 800; i += 10) {
-      const y1 = 300 + Math.sin(i * 0.05) * 100;
-      const y2 = 300 - Math.sin(i * 0.05) * 100;
-      ctx.beginPath();
-      ctx.arc(i, y1, 5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(i, y2, 5, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  } else if (sim === 'Brain') {
-    // Draw neural network
-    ctx.strokeStyle = '#e74c3c';
-    ctx.lineWidth = 2;
-    for (let i = 0; i < 50; i++) {
-      const x = Math.random() * 800;
-      const y = Math.random() * 600;
-      ctx.beginPath();
-      ctx.arc(x, y, 3, 0, Math.PI * 2);
-      ctx.fill();
-      
-      for (let j = 0; j < 3; j++) {
-        const x2 = x + (Math.random() - 0.5) * 100;
-        const y2 = y + (Math.random() - 0.5) * 100;
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x2, y2);
-        ctx.stroke();
-      }
-    }
-  }
-  
-  ctx.fillStyle = '#fff';
-  ctx.font = '24px Arial';
-  ctx.fillText('VR SIMULATION ACTIVE', 250, 50);
-}
-
-window.exitVR = function() {
-  notify('🥽 Exiting VR simulation...');
-  closeGadget();
-};
-
-// PCR MACHINE, CENTRIFUGE, pH METER - Simplified versions
-window.showPcr = function() {
-  showGenericGadget({ name: 'PCR Machine', icon: '🧪', desc: 'Thermal cycling for DNA amplification - Full version coming soon!' });
-};
-
-window.showCentrifuge = function() {
-  showGenericGadget({ name: 'Centrifuge', icon: '🌀', desc: 'Separate samples by density - Full version coming soon!' });
-};
-
-window.showPh = function() {
-  showGenericGadget({ name: 'pH Meter', icon: '📏', desc: 'Measure acidity/alkalinity - Full version coming soon!' });
-};
-
-console.log('%c✓ All gadgets loaded successfully!', 'color: #27ae60; font-size: 14px; font-weight: bold;');
-console.log('%c✓ DNA Sequencer, Microscope, Spectrophotometer, Oscilloscope, 3D Printer, Robot Builder, VR Station ready!', 'color: #3498db; font-size: 12px;');
+console.log('%c✓ PCR Machine, Centrifuge, pH Meter loaded!', 'color: #27ae60; font-size: 14px; font-weight: bold;');
 </body>
 </html>
